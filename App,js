@@ -1,0 +1,67 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./App.css";
+function App() {
+  const [data, setData] = useState({ hits: [] });
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await axios(
+        "https://hn.algolia.com/api/v1/search?query=redux"
+      );
+      setData(result.data);
+    };
+
+    fetchData();
+  }, []);
+
+  const onChange = (e) => {
+    setQuery(e.target.value);
+  };
+  return (
+    <div>
+      <label>Title to Search : </label>
+      <input
+        type="text"
+        value={query}
+        onChange={onChange}
+        placeholder="Search..."
+        id="search-box"
+      />
+      <table id="customers">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>NumComments</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.hits
+            .filter((data1) => {
+              if (query == null) return data1;
+              else if (
+                data1.title.toLowerCase().includes(query.toLowerCase())
+              ) {
+                return data1;
+              }
+            })
+            .map((data1) => {
+              return (
+                <tr key={data1.objectID}>
+                  <td>{data1.title}</td>
+                  <td>{data1.author}</td>
+                  <td>{data1.num_comments}</td>
+                  <td>{data1.points}</td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default App;
